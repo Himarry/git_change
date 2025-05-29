@@ -1,251 +1,288 @@
-@echo off
-setlocal enabledelayedexpansion
-chcp 932 > nul
-title GitÝ’è•ÏXƒc[ƒ‹
-
-:: PythonƒXƒNƒŠƒvƒg‚ÌƒpƒX‚ðÝ’è
-set SCRIPT_PATH=%~dp0git_config_changer.py
-
-:menu
-cls
-echo ======================================
-echo       GitÝ’è•ÏXƒc[ƒ‹ ƒƒjƒ…[
-echo ======================================
-echo.
-echo  1. Œ»Ý‚ÌGitÝ’è‚ð•\Ž¦
-echo  2. GitÝ’è‚ð•ÏX
-echo  3. Ý’èƒvƒƒtƒ@ƒCƒ‹‚ð•Û‘¶
-echo  4. ƒvƒƒtƒ@ƒCƒ‹ˆê——‚ð•\Ž¦
-echo  5. ƒvƒƒtƒ@ƒCƒ‹‚ð“Ç‚Ýž‚ñ‚Å“K—p
-echo  6. ƒvƒƒtƒ@ƒCƒ‹‚ðíœ
-echo  0. I—¹
-echo.
-echo ======================================
-echo.
-
-set /p choice=‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢ (0-6): 
-
-if "%choice%"=="0" goto :exit
-if "%choice%"=="1" goto :show_current
-if "%choice%"=="2" goto :change_config
-if "%choice%"=="3" goto :save_profile
-if "%choice%"=="4" goto :list_profiles
-if "%choice%"=="5" goto :load_profile
-if "%choice%"=="6" goto :delete_profile
-
-echo –³Œø‚È‘I‘ð‚Å‚·B‚à‚¤ˆê“x‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢B
-timeout /t 2 > nul
-goto :menu
-
-:show_current
-cls
-echo ======================================
-echo       Œ»Ý‚ÌGitÝ’è
-echo ======================================
-echo.
-echo ‚Ç‚ÌÝ’è‚ð•\Ž¦‚µ‚Ü‚·‚©H
-echo  1. ƒOƒ[ƒoƒ‹Ý’è (‘SƒŠƒ|ƒWƒgƒŠ‹¤’Ê)
-echo  2. ƒ[ƒJƒ‹Ý’è (Œ»Ý‚ÌƒŠƒ|ƒWƒgƒŠ‚Ì‚Ý)
-echo  3. —¼•û‚ÌÝ’è‚ð•\Ž¦
-echo.
-set /p scope_choice=‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢ (1-3): 
-
-echo.
-if "%scope_choice%"=="1" (
-    python "%SCRIPT_PATH%" current
-) else if "%scope_choice%"=="2" (
-    python "%SCRIPT_PATH%" current --local
-) else if "%scope_choice%"=="3" (
-    echo ƒOƒ[ƒoƒ‹Ý’è:
-    echo ----------------
-    python "%SCRIPT_PATH%" current
-    echo.
-    echo ƒ[ƒJƒ‹Ý’è:
-    echo ----------------
-    python "%SCRIPT_PATH%" current --local
-) else (
-    echo –³Œø‚È‘I‘ð‚Å‚·BƒOƒ[ƒoƒ‹Ý’è‚ð•\Ž¦‚µ‚Ü‚·B
-    python "%SCRIPT_PATH%" current
-)
-
-echo.
-echo ======================================
-echo.
-pause
-goto :menu
-
-:change_config
-cls
-echo ======================================
-echo       GitÝ’è•ÏX
-echo ======================================
-echo.
-echo ‚Ç‚ÌÝ’è‚ð•ÏX‚µ‚Ü‚·‚©H
-echo  1. ƒOƒ[ƒoƒ‹Ý’è (‘SƒŠƒ|ƒWƒgƒŠ‹¤’Ê)
-echo  2. ƒ[ƒJƒ‹Ý’è (Œ»Ý‚ÌƒŠƒ|ƒWƒgƒŠ‚Ì‚Ý)
-echo  3. —¼•ûˆêŠ‡•ÏX
-echo.
-set /p scope_choice=‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢ (1-3): 
-
-echo.
-echo Ý’è‚ð•ÏX‚µ‚Ü‚·B‹ó”’‚Ìê‡‚Í•ÏX‚µ‚Ü‚¹‚ñB
-echo.
-set /p new_name=V‚µ‚¢ƒ†[ƒU[–¼i‹ó”’‚Ìê‡‚Í•ÏX‚È‚µj: 
-set /p new_email=V‚µ‚¢ƒ[ƒ‹ƒAƒhƒŒƒXi‹ó”’‚Ìê‡‚Í•ÏX‚È‚µj: 
-
-if "%scope_choice%"=="3" (
-    echo.
-    echo ƒOƒ[ƒoƒ‹Ý’è‚Æƒ[ƒJƒ‹Ý’è‚Ì—¼•û‚ð•ÏX‚µ‚Ü‚·...
-    
-    set cmd_global=python "%SCRIPT_PATH%" set
-    if not "!new_name!"=="" set cmd_global=!cmd_global! --name "!new_name!"
-    if not "!new_email!"=="" set cmd_global=!cmd_global! --email "!new_email!"
-    
-    echo.
-    echo ƒOƒ[ƒoƒ‹Ý’è‚Ì•ÏX:
-    !cmd_global!
-    
-    set cmd_local=python "%SCRIPT_PATH%" set
-    if not "!new_name!"=="" set cmd_local=!cmd_local! --name "!new_name!"
-    if not "!new_email!"=="" set cmd_local=!cmd_local! --email "!new_email!"
-    set cmd_local=!cmd_local! --local
-    
-    echo.
-    echo ƒ[ƒJƒ‹Ý’è‚Ì•ÏX:
-    !cmd_local!
-) else (
-    set cmd=python "%SCRIPT_PATH%" set
-    if not "!new_name!"=="" set cmd=!cmd! --name "!new_name!"
-    if not "!new_email!"=="" set cmd=!cmd! --email "!new_email!"
-    if "%scope_choice%"=="2" set cmd=!cmd! --local
-    
-    echo.
-    echo ŽÀs:
-    !cmd!
-)
-echo.
-echo ======================================
-echo.
-pause
-goto :menu
-
-:save_profile
-cls
-echo ======================================
-echo       ƒvƒƒtƒ@ƒCƒ‹•Û‘¶
-echo ======================================
-echo.
-set /p profile_name=ƒvƒƒtƒ@ƒCƒ‹–¼: 
-echo.
-echo Œ»Ý‚ÌÝ’è‚ðŽg—p‚·‚é‚©AV‚µ‚¢Ý’è‚ðŽw’è‚Å‚«‚Ü‚·B
-echo ‹ó”’‚Ìê‡‚ÍŒ»Ý‚ÌÝ’è‚ªŽg—p‚³‚ê‚Ü‚·B
-echo.
-set /p use_current=Œ»Ý‚ÌÝ’è‚ðŽg—p‚µ‚Ü‚·‚©H (Y/N): 
-
-if /i "!use_current!"=="Y" (
-    python "%SCRIPT_PATH%" save "!profile_name!"
-) else (
-    set /p new_name=V‚µ‚¢ƒ†[ƒU[–¼: 
-    set /p new_email=V‚µ‚¢ƒ[ƒ‹ƒAƒhƒŒƒX: 
-    
-    set cmd=python "%SCRIPT_PATH%" save "!profile_name!"
-    if not "!new_name!"=="" set cmd=!cmd! --name "!new_name!"
-    if not "!new_email!"=="" set cmd=!cmd! --email "!new_email!"
-    
-    !cmd!
-)
-echo.
-echo ======================================
-echo.
-pause
-goto :menu
-
-:list_profiles
-cls
-echo ======================================
-echo       ƒvƒƒtƒ@ƒCƒ‹ˆê——
-echo ======================================
-echo.
-python "%SCRIPT_PATH%" list
-echo.
-echo ======================================
-echo.
-pause
-goto :menu
-
-:load_profile
-cls
-echo ======================================
-echo       ƒvƒƒtƒ@ƒCƒ‹“Ç‚Ýž‚Ý
-echo ======================================
-echo.
-echo —˜—p‰Â”\‚Èƒvƒƒtƒ@ƒCƒ‹:
-echo --------------------------
-python "%SCRIPT_PATH%" list
-echo --------------------------
-echo.
-set /p profile_name=“Ç‚Ýž‚Þƒvƒƒtƒ@ƒCƒ‹–¼: 
-echo.
-echo ‚Ç‚ÌÝ’è‚É“K—p‚µ‚Ü‚·‚©H
-echo  1. ƒOƒ[ƒoƒ‹Ý’è (‘SƒŠƒ|ƒWƒgƒŠ‹¤’Ê)
-echo  2. ƒ[ƒJƒ‹Ý’è (Œ»Ý‚ÌƒŠƒ|ƒWƒgƒŠ‚Ì‚Ý)
-echo  3. —¼•û‚ÉˆêŠ‡“K—p
-echo.
-set /p scope_choice=‘I‘ð‚µ‚Ä‚­‚¾‚³‚¢ (1-3): 
-
-echo.
-if "%scope_choice%"=="1" (
-    python "%SCRIPT_PATH%" load "!profile_name!"
-) else if "%scope_choice%"=="2" (
-    python "%SCRIPT_PATH%" load "!profile_name!" --local
-) else if "%scope_choice%"=="3" (
-    echo ƒOƒ[ƒoƒ‹Ý’è‚Æƒ[ƒJƒ‹Ý’è‚Ì—¼•û‚Éƒvƒƒtƒ@ƒCƒ‹‚ð“K—p‚µ‚Ü‚·...
-    
-    echo.
-    echo ƒOƒ[ƒoƒ‹Ý’è‚É“K—p:
-    python "%SCRIPT_PATH%" load "!profile_name!"
-    
-    echo.
-    echo ƒ[ƒJƒ‹Ý’è‚É“K—p:
-    python "%SCRIPT_PATH%" load "!profile_name!" --local
-) else (
-    echo –³Œø‚È‘I‘ð‚Å‚·BƒOƒ[ƒoƒ‹Ý’è‚É“K—p‚µ‚Ü‚·B
-    python "%SCRIPT_PATH%" load "!profile_name!"
-)
-
-echo.
-echo ======================================
-echo.
-pause
-goto :menu
-
-:delete_profile
-cls
-echo ======================================
-echo       ƒvƒƒtƒ@ƒCƒ‹íœ
-echo ======================================
-echo.
-echo —˜—p‰Â”\‚Èƒvƒƒtƒ@ƒCƒ‹:
-echo --------------------------
-python "%SCRIPT_PATH%" list
-echo --------------------------
-echo.
-set /p profile_name=íœ‚·‚éƒvƒƒtƒ@ƒCƒ‹–¼: 
-echo.
-set /p confirm=–{“–‚Éíœ‚µ‚Ü‚·‚©H (Y/N): 
-if /i "!confirm!"=="Y" (
-    python "%SCRIPT_PATH%" delete "!profile_name!"
-) else (
-    echo íœ‚ðƒLƒƒƒ“ƒZƒ‹‚µ‚Ü‚µ‚½B
-)
-echo.
-echo ======================================
-echo.
-pause
-goto :menu
-
-:exit
-cls
-echo GitÝ’è•ÏXƒc[ƒ‹‚ðI—¹‚µ‚Ü‚·B
-timeout /t 2 > nul
-exit /b 0
+@echo off
+
+setlocal enabledelayedexpansion
+
+chcp 932 > nul
+
+title Gitè¨­å®šå¤‰æ›´ãƒ„ãƒ¼ãƒ«
+
+
+:: Pythonã‚¹ã‚¯ãƒªãƒ—ãƒˆã®ãƒ‘ã‚¹ã‚’è¨­å®š
+set SCRIPT_PATH=%~dp0git_config_changer.py
+
+
+:menu
+
+cls
+
+echo ======================================
+echo       Gitè¨­å®šå¤‰æ›´ãƒ„ãƒ¼ãƒ« ãƒ¡ãƒ‹ãƒ¥ãƒ¼
+echo ======================================
+echo.
+echo  1. ç¾åœ¨ã®Gitè¨­å®šã‚’è¡¨ç¤º
+echo  2. Gitè¨­å®šã‚’å¤‰æ›´
+echo  3. è¨­å®šãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ä¿å­˜
+echo  4. ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§ã‚’è¡¨ç¤º
+echo  5. ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã‚’èª­ã¿è¾¼ã‚“ã§é©ç”¨
+echo  6. ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã‚’å‰Šé™¤
+echo  0. çµ‚äº†
+echo.
+echo ======================================
+echo.
+
+set /p choice=é¸æŠžã—ã¦ãã ã•ã„ (0-6): 
+
+if "%choice%"=="0" goto :exit
+if "%choice%"=="1" goto :show_current
+if "%choice%"=="2" goto :change_config
+if "%choice%"=="3" goto :save_profile
+if "%choice%"=="4" goto :list_profiles
+if "%choice%"=="5" goto :load_profile
+if "%choice%"=="6" goto :delete_profile
+
+echo ç„¡åŠ¹ãªé¸æŠžã§ã™ã€‚ã‚‚ã†ä¸€åº¦é¸æŠžã—ã¦ãã ã•ã„ã€‚
+timeout /t 2 > nul
+goto :menu
+
+
+:show_current
+cls
+
+echo ======================================
+echo       ç¾åœ¨ã®Gitè¨­å®š
+echo ======================================
+echo.
+echo ã©ã®è¨­å®šã‚’è¡¨ç¤ºã—ã¾ã™ã‹ï¼Ÿ
+echo  1. ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®š (å…¨ãƒªãƒã‚¸ãƒˆãƒªå…±é€š)
+echo  2. ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®š (ç¾åœ¨ã®ãƒªãƒã‚¸ãƒˆãƒªã®ã¿)
+echo  3. ä¸¡æ–¹ã®è¨­å®šã‚’è¡¨ç¤º
+echo.
+set /p scope_choice=é¸æŠžã—ã¦ãã ã•ã„ (1-3): 
+
+echo.
+if "%scope_choice%"=="1" (
+    REM ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã®ã¿è¡¨ç¤º
+    python "%SCRIPT_PATH%" current
+) else if "%scope_choice%"=="2" (
+    REM ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šã®ã¿è¡¨ç¤º
+    python "%SCRIPT_PATH%" current --local
+) else if "%scope_choice%"=="3" (
+    REM ä¸¡æ–¹ã®è¨­å®šã‚’è¡¨ç¤º
+    echo ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®š:
+    echo ----------------
+    python "%SCRIPT_PATH%" current
+    echo.
+    echo ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®š:
+    echo ----------------
+    python "%SCRIPT_PATH%" current --local
+) else (
+    REM ç„¡åŠ¹ãªé¸æŠžã®å ´åˆ
+    echo ç„¡åŠ¹ãªé¸æŠžã§ã™ã€‚ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã‚’è¡¨ç¤ºã—ã¾ã™ã€‚
+    python "%SCRIPT_PATH%" current
+)
+
+echo.
+echo ======================================
+echo.
+pause
+goto :menu
+
+
+:change_config
+cls
+
+echo ======================================
+echo       Gitè¨­å®šå¤‰æ›´
+echo ======================================
+echo.
+echo ã©ã®è¨­å®šã‚’å¤‰æ›´ã—ã¾ã™ã‹ï¼Ÿ
+echo  1. ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®š (å…¨ãƒªãƒã‚¸ãƒˆãƒªå…±é€š)
+echo  2. ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®š (ç¾åœ¨ã®ãƒªãƒã‚¸ãƒˆãƒªã®ã¿)
+echo  3. ä¸¡æ–¹ä¸€æ‹¬å¤‰æ›´
+echo.
+set /p scope_choice=é¸æŠžã—ã¦ãã ã•ã„ (1-3): 
+
+echo.
+echo è¨­å®šã‚’å¤‰æ›´ã—ã¾ã™ã€‚ç©ºç™½ã®å ´åˆã¯å¤‰æ›´ã—ã¾ã›ã‚“ã€‚
+echo.
+set /p new_name=æ–°ã—ã„ãƒ¦ãƒ¼ã‚¶ãƒ¼åï¼ˆç©ºç™½ã®å ´åˆã¯å¤‰æ›´ãªã—ï¼‰: 
+set /p new_email=æ–°ã—ã„ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ï¼ˆç©ºç™½ã®å ´åˆã¯å¤‰æ›´ãªã—ï¼‰: 
+
+if "%scope_choice%"=="3" (
+    REM ä¸¡æ–¹ä¸€æ‹¬å¤‰æ›´ã®å ´åˆ
+    echo.
+    echo ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã¨ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šã®ä¸¡æ–¹ã‚’å¤‰æ›´ã—ã¾ã™...
+    
+    REM ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šå¤‰æ›´
+    set cmd_global=python "%SCRIPT_PATH%" set
+    if not "!new_name!"=="" set cmd_global=!cmd_global! --name "!new_name!"
+    if not "!new_email!"=="" set cmd_global=!cmd_global! --email "!new_email!"
+    
+    echo.
+    echo ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã®å¤‰æ›´: !cmd_global!
+    echo.
+    !cmd_global!
+    
+    REM ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šå¤‰æ›´
+    set cmd_local=python "%SCRIPT_PATH%" set
+    if not "!new_name!"=="" set cmd_local=!cmd_local! --name "!new_name!"
+    if not "!new_email!"=="" set cmd_local=!cmd_local! --email "!new_email!"
+    set cmd_local=!cmd_local! --local
+    
+    echo.
+    echo ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šã®å¤‰æ›´: !cmd_local!
+    echo.
+    !cmd_local!
+) else (
+    REM å€‹åˆ¥è¨­å®šå¤‰æ›´ã®å ´åˆ
+    set cmd=python "%SCRIPT_PATH%" set
+    if not "!new_name!"=="" set cmd=!cmd! --name "!new_name!"
+    if not "!new_email!"=="" set cmd=!cmd! --email "!new_email!"
+    if "%scope_choice%"=="2" set cmd=!cmd! --local
+    
+    echo.
+    echo å®Ÿè¡Œ: !cmd!
+    echo.
+    !cmd!
+)
+echo.
+echo ======================================
+echo.
+pause
+goto :menu
+
+
+:save_profile
+cls
+
+echo ======================================
+echo       ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ä¿å­˜
+echo ======================================
+echo.
+set /p profile_name=ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«å: 
+echo.
+echo ç¾åœ¨ã®è¨­å®šã‚’ä½¿ç”¨ã™ã‚‹ã‹ã€æ–°ã—ã„è¨­å®šã‚’æŒ‡å®šã§ãã¾ã™ã€‚
+echo ç©ºç™½ã®å ´åˆã¯ç¾åœ¨ã®è¨­å®šãŒä½¿ç”¨ã•ã‚Œã¾ã™ã€‚
+echo.
+set /p use_current=ç¾åœ¨ã®è¨­å®šã‚’ä½¿ç”¨ã—ã¾ã™ã‹ï¼Ÿ (Y/N): 
+
+if /i "!use_current!"=="Y" (
+    python "%SCRIPT_PATH%" save "!profile_name!"
+) else (
+    set /p new_name=æ–°ã—ã„ãƒ¦ãƒ¼ã‚¶ãƒ¼å: 
+    set /p new_email=æ–°ã—ã„ãƒ¡ãƒ¼ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹: 
+    
+    set cmd=python "%SCRIPT_PATH%" save "!profile_name!"
+    if not "!new_name!"=="" set cmd=!cmd! --name "!new_name!"
+    if not "!new_email!"=="" set cmd=!cmd! --email "!new_email!"
+    
+    !cmd!
+)
+echo.
+echo ======================================
+echo.
+pause
+goto :menu
+
+
+:list_profiles
+cls
+
+echo ======================================
+echo       ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ä¸€è¦§
+echo ======================================
+echo.
+python "%SCRIPT_PATH%" list
+echo.
+echo ======================================
+echo.
+pause
+goto :menu
+
+
+:load_profile
+cls
+
+echo ======================================
+echo       ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«èª­ã¿è¾¼ã¿
+echo ======================================
+echo.
+echo åˆ©ç”¨å¯èƒ½ãªãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«:
+echo --------------------------
+python "%SCRIPT_PATH%" list
+echo --------------------------
+echo.
+set /p profile_name=èª­ã¿è¾¼ã‚€ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«å: 
+echo.
+echo ã©ã®è¨­å®šã«é©ç”¨ã—ã¾ã™ã‹ï¼Ÿ
+echo  1. ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®š (å…¨ãƒªãƒã‚¸ãƒˆãƒªå…±é€š)
+echo  2. ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®š (ç¾åœ¨ã®ãƒªãƒã‚¸ãƒˆãƒªã®ã¿)
+echo  3. ä¸¡æ–¹ã«ä¸€æ‹¬é©ç”¨
+echo.
+set /p scope_choice=é¸æŠžã—ã¦ãã ã•ã„ (1-3): 
+
+echo.
+if "%scope_choice%"=="1" (
+    REM ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã®ã¿é©ç”¨
+    python "%SCRIPT_PATH%" load "!profile_name!"
+) else if "%scope_choice%"=="2" (
+    REM ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šã®ã¿é©ç”¨
+    python "%SCRIPT_PATH%" load "!profile_name!" --local
+) else if "%scope_choice%"=="3" (
+    REM ä¸¡æ–¹ã«ä¸€æ‹¬é©ç”¨
+    echo ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã¨ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šã®ä¸¡æ–¹ã«ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é©ç”¨ã—ã¾ã™...
+    
+    REM ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã«é©ç”¨
+    echo.
+    echo ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã«é©ç”¨:
+    python "%SCRIPT_PATH%" load "!profile_name!"
+    
+    REM ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šã«é©ç”¨
+    echo.
+    echo ãƒ­ãƒ¼ã‚«ãƒ«è¨­å®šã«é©ç”¨:
+    python "%SCRIPT_PATH%" load "!profile_name!" --local
+) else (
+    REM ç„¡åŠ¹ãªé¸æŠžã®å ´åˆ
+    echo ç„¡åŠ¹ãªé¸æŠžã§ã™ã€‚ã‚°ãƒ­ãƒ¼ãƒãƒ«è¨­å®šã«é©ç”¨ã—ã¾ã™ã€‚
+    python "%SCRIPT_PATH%" load "!profile_name!"
+)
+
+echo.
+echo ======================================
+echo.
+pause
+goto :menu
+
+
+:delete_profile
+cls
+
+echo ======================================
+echo       ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«å‰Šé™¤
+echo ======================================
+echo.
+echo åˆ©ç”¨å¯èƒ½ãªãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«:
+echo --------------------------
+python "%SCRIPT_PATH%" list
+echo --------------------------
+echo.
+set /p profile_name=å‰Šé™¤ã™ã‚‹ãƒ—ãƒ­ãƒ•ã‚¡ã‚¤ãƒ«å: 
+echo.
+set /p confirm=æœ¬å½“ã«å‰Šé™¤ã—ã¾ã™ã‹ï¼Ÿ (Y/N): 
+if /i "!confirm!"=="Y" (
+    python "%SCRIPT_PATH%" delete "!profile_name!"
+) else (
+    echo å‰Šé™¤ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ã¾ã—ãŸã€‚
+)
+echo.
+echo ======================================
+echo.
+pause
+goto :menu
+
+
+:exit
+cls
+echo Gitè¨­å®šå¤‰æ›´ãƒ„ãƒ¼ãƒ«ã‚’çµ‚äº†ã—ã¾ã™ã€‚
+timeout /t 2 > nul
+exit /b 0
