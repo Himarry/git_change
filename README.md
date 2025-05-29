@@ -4,11 +4,11 @@
 
 ## 機能
 
-- 現在のGit設定（ユーザー名とメールアドレス）の表示
-- Git設定の変更
+- 現在のGit設定（ユーザー名とメールアドレス）の表示（グローバル・ローカル両対応、一括表示可能）
+- Git設定の変更（グローバル・ローカル両対応、一括変更可能）
 - 設定プロファイルの保存
 - 保存されたプロファイル一覧の表示
-- プロファイルの読み込みと適用
+- プロファイルの読み込みと適用（グローバル・ローカル両対応、一括適用可能）
 - プロファイルの削除
 
 ## インストール
@@ -20,13 +20,21 @@
 ### 現在の設定を表示
 
 ```
+# グローバル設定を表示
 python git_config_changer.py current
+
+# ローカル設定を表示
+python git_config_changer.py current --local
 ```
 
 ### Git設定を変更
 
 ```
+# グローバル設定を変更
 python git_config_changer.py set --name "新しい名前" --email "新しいメール@example.com"
+
+# ローカル設定を変更
+python git_config_changer.py set --name "新しい名前" --email "新しいメール@example.com" --local
 ```
 
 ### 現在の設定をプロファイルとして保存
@@ -50,7 +58,11 @@ python git_config_changer.py list
 ### プロファイルを読み込んで適用
 
 ```
+# グローバル設定に適用
 python git_config_changer.py load プロファイル名
+
+# ローカル設定に適用
+python git_config_changer.py load プロファイル名 --local
 ```
 
 ### プロファイルを削除
@@ -65,4 +77,9 @@ python git_config_changer.py delete プロファイル名
 
 ## 注意事項
 
-このスクリプトはグローバルGit設定（`--global`）を変更します。特定のリポジトリのみの設定を変更したい場合は、スクリプトを修正する必要があります。
+このスクリプトはグローバルGit設定（`--global`）とローカル設定の両方を変更できます。
+
+- グローバル設定：すべてのGitリポジトリに適用される設定です
+- ローカル設定：現在のリポジトリにのみ適用される設定です
+
+ローカル設定を変更する場合は、Gitリポジトリ内で実行する必要があります。

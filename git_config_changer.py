@@ -9,18 +9,21 @@ import argparse
 from pathlib import Path
 
 
-def get_current_git_config():
+def get_current_git_config(is_global=True):
     """現在のGit設定を取得する"""
     try:
+        # グローバルかローカルかのオプション設定
+        global_option = ["--global"] if is_global else []
+        
         # ユーザー名を取得
         name_result = subprocess.run(
-            ["git", "config", "--global", "user.name"],
+            ["git", "config"] + global_option + ["user.name"],
             capture_output=True, text=True, check=False
         )
         
         # メールアドレスを取得
         email_result = subprocess.run(
-            ["git", "config", "--global", "user.email"],
+            ["git", "config"] + global_option + ["user.email"],
             capture_output=True, text=True, check=False
         )
         
@@ -34,24 +37,28 @@ def get_current_git_config():
         return "", ""
 
 
-def set_git_config(name, email):
+def set_git_config(name, email, is_global=True):
     """Git設定を変更する"""
     try:
+        # グローバルかローカルかのオプション設定
+        global_option = ["--global"] if is_global else []
+        scope_text = "グローバル" if is_global else "ローカル"
+        
         # ユーザー名を設定
         if name:
             subprocess.run(
-                ["git", "config", "--global", "user.name", name],
+                ["git", "config"] + global_option + ["user.name", name],
                 check=True
             )
-            print(f"Git ユーザー名を '{name}' に設定しました")
+            print(f"{scope_text} Git ユーザー名を '{name}' に設定しました")
         
         # メールアドレスを設定
         if email:
             subprocess.run(
-                ["git", "config", "--global", "user.email", email],
+                ["git", "config"] + global_option + ["user.email", email],
                 check=True
             )
-            print(f"Git メールアドレスを '{email}' に設定しました")
+            print(f"{scope_text} Git メールアドレスを '{email}' に設定しました")
             
         return True
     
@@ -122,7 +129,7 @@ def list_profiles(profiles_file):
         return []
 
 
-def load_profile(profile_name, profiles_file):
+def load_profile(profile_name, profiles_file, is_global=True):
     """プロファイルを読み込み設定を適用する"""
     if not os.path.exists(profiles_file):
         print("プロファイルファイルが存在しません")
@@ -140,8 +147,9 @@ def load_profile(profile_name, profiles_file):
         name = profile.get("name", "")
         email = profile.get("email", "")
         
-        if set_git_config(name, email):
-            print(f"プロファイル '{profile_name}' を適用しました")
+        if set_git_config(name, email, is_global):
+            scope_text = "グローバル" if is_global else "ローカル"
+            print(f"{scope_text}設定にプロファイル '{profile_name}' を適用しました")
             return True
         
         return False
@@ -184,8 +192,7 @@ def main():
     # プロファイル保存先ディレクトリの設定
     config_dir = os.path.join(Path.home(), ".git_profiles")
     profiles_file = os.path.join(config_dir, "profiles.json")
-    
-    # コマンドライン引数のパーサー作成
+      # コマンドライン引数のパーサー作成
     parser = argparse.ArgumentParser(description='Gitのユーザー名とメールアドレスを管理するツール')
     
     # サブコマンドパーサー作成
@@ -193,11 +200,13 @@ def main():
     
     # 現在の設定を表示するコマンド
     current_parser = subparsers.add_parser('current', help='現在のGit設定を表示')
+    current_parser.add_argument('--local', action='store_true', help='ローカル設定を表示する')
     
     # 設定変更コマンド
     set_parser = subparsers.add_parser('set', help='Git設定を変更')
     set_parser.add_argument('--name', help='設定するGitユーザー名')
     set_parser.add_argument('--email', help='設定するGitメールアドレス')
+    set_parser.add_argument('--local', action='store_true', help='ローカル設定を変更する')
     
     # プロファイル保存コマンド
     save_parser = subparsers.add_parser('save', help='現在の設定をプロファイルとして保存')
@@ -207,10 +216,10 @@ def main():
     
     # プロファイル一覧表示コマンド
     list_parser = subparsers.add_parser('list', help='保存されたプロファイル一覧を表示')
-    
-    # プロファイル読み込みコマンド
+      # プロファイル読み込みコマンド
     load_parser = subparsers.add_parser('load', help='プロファイルを読み込み設定を適用')
     load_parser.add_argument('profile_name', help='プロファイル名')
+    load_parser.add_argument('--local', action='store_true', help='ローカル設定に適用する')
     
     # プロファイル削除コマンド
     delete_parser = subparsers.add_parser('delete', help='保存されたプロファイルを削除')
@@ -223,11 +232,12 @@ def main():
     if not args.command:
         parser.print_help()
         sys.exit(1)
-    
-    # 現在の設定を表示
+      # 現在の設定を表示
     if args.command == 'current':
-        name, email = get_current_git_config()
-        print("現在のGit設定:")
+        is_global = not args.local
+        scope_text = "グローバル" if is_global else "ローカル"
+        name, email = get_current_git_config(is_global)
+        print(f"現在の{scope_text} Git設定:")
         print(f"ユーザー名: {name}")
         print(f"メールアドレス: {email}")
     
@@ -237,7 +247,8 @@ def main():
             print("エラー: ユーザー名かメールアドレス、またはその両方を指定してください")
             sys.exit(1)
         
-        set_git_config(args.name, args.email)
+        is_global = not args.local
+        set_git_config(args.name, args.email, is_global)
     
     # プロファイル保存
     elif args.command == 'save':
@@ -258,10 +269,10 @@ def main():
     # プロファイル一覧表示
     elif args.command == 'list':
         list_profiles(profiles_file)
-    
-    # プロファイル読み込み適用
+      # プロファイル読み込み適用
     elif args.command == 'load':
-        load_profile(args.profile_name, profiles_file)
+        is_global = not args.local
+        load_profile(args.profile_name, profiles_file, is_global)
     
     # プロファイル削除
     elif args.command == 'delete':
